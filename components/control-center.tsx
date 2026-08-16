@@ -54,8 +54,9 @@ export function ControlCenter() {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ message: trimmed }),
       })
-      const data = await response.json()
-      setMessages((items) => [...items, { role: 'assistant', text: data.text ?? 'I could not complete that request.' }])
+      if (!response.ok) throw new Error('Chat request failed')
+      const text = await response.text()
+      setMessages((items) => [...items, { role: 'assistant', text: text || 'I could not complete that request.' }])
     } catch {
       setMessages((items) => [...items, { role: 'assistant', text: 'The agent is unavailable. Check your provider configuration and try again.' }])
     } finally {
