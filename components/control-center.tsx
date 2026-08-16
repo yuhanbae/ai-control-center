@@ -45,6 +45,15 @@ export function ControlCenter() {
   const [provider, setProvider] = useState({ name: 'My provider', baseUrl: 'https://api.openai.com/v1', model: 'gpt-4o-mini', apiKey: '' })
   const [providerSaved, setProviderSaved] = useState(false)
 
+  function openProviderSetup() {
+    setMobileOpen(false)
+    setProviderOpen(true)
+  }
+
+  function useSuggestion(text: string) {
+    setPrompt(text)
+  }
+
   async function submitPrompt() {
     const trimmed = prompt.trim()
     if (!trimmed || isThinking) return
@@ -101,9 +110,9 @@ export function ControlCenter() {
         </header>
         <div className="flex min-h-0 flex-1">
           <div className="flex min-w-0 flex-1 flex-col">
-            <div className="flex items-center justify-between border-b border-border px-5 py-3 lg:px-8"><button className="flex items-center gap-2 text-sm font-medium">Supix Agent <ChevronDown className="size-3.5 text-muted-foreground" /></button><div className="flex items-center gap-2"><span className="hidden text-xs text-muted-foreground sm:block">Using</span><button className="flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs"><span className="size-1.5 rounded-full bg-primary" /> NVIDIA · Nemotron <ChevronDown className="size-3 text-muted-foreground" /></button></div></div>
+            <div className="flex items-center justify-between border-b border-border px-5 py-3 lg:px-8"><button className="flex items-center gap-2 text-sm font-medium">Supix Agent <ChevronDown className="size-3.5 text-muted-foreground" /></button><div className="flex items-center gap-2"><span className="hidden text-xs text-muted-foreground sm:block">Using</span><button onClick={openProviderSetup} className="flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs"><span className="size-1.5 rounded-full bg-primary" /> NVIDIA · Nemotron <ChevronDown className="size-3 text-muted-foreground" /></button></div></div>
             <div className="flex flex-1 flex-col justify-end overflow-auto px-5 py-8 lg:px-16">
-              {messages.length === 0 ? <div className="mx-auto mb-auto flex max-w-xl flex-col items-center justify-center pt-16 text-center"><div className="mb-5 flex size-14 items-center justify-center rounded-2xl border border-border bg-card shadow-sm"><Bot className="size-6" /></div><h1 className="text-balance text-2xl font-semibold tracking-tight">What can I help you build?</h1><p className="mt-2 text-sm leading-6 text-muted-foreground">Ask Supix to reason across your connected models and MCP tools.</p><div className="mt-8 grid w-full gap-2 sm:grid-cols-2"><Suggestion icon={TerminalSquare} text="Find open issues in my repo" /><Suggestion icon={Wrench} text="Inspect my connected tools" /></div></div> : <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">{messages.map((message, index) => <div key={index} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'border border-border bg-card'}`}>{message.text}</div></div>)}{isThinking && <div className="flex items-center gap-2 text-xs text-muted-foreground"><Activity className="size-3.5 animate-pulse" /> Supix is working across your tools...</div>}</div>}
+              {messages.length === 0 ? <div className="mx-auto mb-auto flex max-w-xl flex-col items-center justify-center pt-16 text-center"><div className="mb-5 flex size-14 items-center justify-center rounded-2xl border border-border bg-card shadow-sm"><Bot className="size-6" /></div><h1 className="text-balance text-2xl font-semibold tracking-tight">What can I help you build?</h1><p className="mt-2 text-sm leading-6 text-muted-foreground">Ask Supix to reason across your connected models and MCP tools.</p><div className="mt-8 grid w-full gap-2 sm:grid-cols-2"><Suggestion icon={TerminalSquare} text="Find open issues in my repo" onSelect={useSuggestion} /><Suggestion icon={Wrench} text="Inspect my connected tools" onSelect={useSuggestion} /></div></div> : <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">{messages.map((message, index) => <div key={index} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}><div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'border border-border bg-card'}`}>{message.text}</div></div>)}{isThinking && <div className="flex items-center gap-2 text-xs text-muted-foreground"><Activity className="size-3.5 animate-pulse" /> Supix is working across your tools...</div>}</div>}
             </div>
             <div className="px-5 pb-5 lg:px-16 lg:pb-8"><div className="mx-auto max-w-2xl rounded-xl border border-border bg-card p-2 shadow-sm"><textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && event.keyCode !== 229) { event.preventDefault(); void submitPrompt() } }} placeholder="Message Supix..." className="min-h-12 w-full resize-none bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground" /><div className="flex items-center justify-between px-2"><span className="flex items-center gap-1.5 text-[11px] text-muted-foreground"><ShieldCheck className="size-3.5" /> Secure by design</span><button aria-label="Send message" onClick={() => void submitPrompt()} disabled={!prompt.trim() || isThinking} className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground disabled:opacity-40"><Send className="size-3.5" /></button></div></div><p className="mt-2 text-center text-[10px] text-muted-foreground">Supix can make mistakes. Review tool actions before they run.</p></div>
           </div>
@@ -114,4 +123,4 @@ export function ControlCenter() {
   )
 }
 
-function Suggestion({ icon: Icon, text }: { icon: typeof TerminalSquare; text: string }) { return <button onClick={() => {}} className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 text-left text-xs text-muted-foreground hover:bg-accent hover:text-foreground"><Icon className="size-4 shrink-0" />{text}</button> }
+function Suggestion({ icon: Icon, text, onSelect }: { icon: typeof TerminalSquare; text: string; onSelect: (text: string) => void }) { return <button onClick={() => onSelect(text)} className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 text-left text-xs text-muted-foreground hover:bg-accent hover:text-foreground"><Icon className="size-4 shrink-0" />{text}</button> }
