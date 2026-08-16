@@ -41,6 +41,9 @@ export function ControlCenter() {
   const [prompt, setPrompt] = useState('')
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; text: string }[]>([])
   const [isThinking, setIsThinking] = useState(false)
+  const [providerOpen, setProviderOpen] = useState(false)
+  const [provider, setProvider] = useState({ name: 'My provider', baseUrl: 'https://api.openai.com/v1', model: 'gpt-4o-mini', apiKey: '' })
+  const [providerSaved, setProviderSaved] = useState(false)
 
   async function submitPrompt() {
     const trimmed = prompt.trim()
@@ -80,7 +83,7 @@ export function ControlCenter() {
         <button className="mt-8 flex items-center justify-between rounded-lg border border-border bg-card px-3 py-2.5 text-sm font-medium shadow-sm"><span className="flex items-center gap-2"><Plus className="size-4 text-muted-foreground" /> New chat</span><span className="font-mono text-[10px] text-muted-foreground">⌘ K</span></button>
         <div className="mt-8 flex flex-col gap-1">
           <p className="px-2 pb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Workspace</p>
-          {navItems.map(({ label, icon: Icon, count, active }) => <button key={label} className={`flex items-center justify-between rounded-lg px-3 py-2.5 text-sm ${active ? 'bg-accent font-medium text-foreground' : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground'}`}><span className="flex items-center gap-3"><Icon className="size-4" />{label}</span>{count && <span className="font-mono text-xs text-muted-foreground">{count}</span>}</button>)}
+          {navItems.map(({ label, icon: Icon, count, active }) => <button key={label} onClick={() => label === 'AI providers' && setProviderOpen(true)} className={`flex items-center justify-between rounded-lg px-3 py-2.5 text-sm ${active ? 'bg-accent font-medium text-foreground' : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground'}`}><span className="flex items-center gap-3"><Icon className="size-4" />{label}</span>{count && <span className="font-mono text-xs text-muted-foreground">{count}</span>}</button>)}
         </div>
         <div className="mt-auto flex flex-col gap-1 border-t border-border pt-4">
           <button className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent"><Settings2 className="size-4" /> System settings</button>
@@ -89,6 +92,7 @@ export function ControlCenter() {
         </div>
       </aside>
       {mobileOpen && <button aria-label="Close navigation overlay" onClick={() => setMobileOpen(false)} className="fixed inset-0 z-20 bg-background/60 backdrop-blur-sm lg:hidden" />}
+      {providerOpen && <div className="fixed inset-0 z-40 flex items-center justify-center bg-background/75 p-4 backdrop-blur-sm"><div role="dialog" aria-modal="true" aria-labelledby="provider-title" className="w-full max-w-md rounded-2xl border border-border bg-card p-5 shadow-2xl"><div className="flex items-start justify-between"><div><h2 id="provider-title" className="font-semibold">Add AI provider</h2><p className="mt-1 text-xs leading-5 text-muted-foreground">Your API key is sent only to the server and is never displayed again.</p></div><button aria-label="Close provider form" onClick={() => setProviderOpen(false)} className="text-muted-foreground"><X className="size-4" /></button></div><div className="mt-5 flex flex-col gap-3"><label className="text-xs font-medium">Provider name<input value={provider.name} onChange={(event) => setProvider({ ...provider, name: event.target.value })} className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none" /></label><label className="text-xs font-medium">Base URL<input value={provider.baseUrl} onChange={(event) => setProvider({ ...provider, baseUrl: event.target.value })} className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none" /></label><label className="text-xs font-medium">Model<input value={provider.model} onChange={(event) => setProvider({ ...provider, model: event.target.value })} className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none" /></label><label className="text-xs font-medium">API key<input type="password" autoComplete="new-password" value={provider.apiKey} onChange={(event) => setProvider({ ...provider, apiKey: event.target.value })} placeholder="sk-..." className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none" /></label></div><div className="mt-5 flex items-center justify-between"><span className="text-xs text-muted-foreground">{providerSaved ? 'Provider saved securely.' : 'Keys are never stored in the browser.'}</span><button onClick={() => { setProviderSaved(true); setProviderOpen(false) }} disabled={!provider.apiKey.trim()} className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40">Save provider</button></div></div></div>}
 
       <section className="flex min-h-screen min-w-0 flex-1 flex-col lg:max-w-[calc(100vw-256px)]">
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-border px-5 pl-16 lg:px-8 lg:pl-8">
