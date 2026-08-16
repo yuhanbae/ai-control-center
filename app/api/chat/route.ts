@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
   const provider = resolveProvider(parsed.data.providerId)
   if (!provider) {
-    return Response.json({ text: `I’m ready in local mode. Add a provider in AI providers to connect a real model. You asked: “${parsed.data.message}”` })
+    return new Response(`I’m ready in local mode. Add a provider in AI providers to connect a real model. You asked: “${parsed.data.message}”`, { headers: { 'content-type': 'text/plain; charset=utf-8' } })
   }
 
   const result = streamText({
